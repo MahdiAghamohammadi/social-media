@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])
     ->middleware(['auth', 'verified'])
-    ->name('home');
+    ->name('dashboard');
 
 
 Route::middleware('auth')->group(function () {
