@@ -9,13 +9,14 @@ function isImage(attachment) {
     const mime = attachment.mime.split('/')
     return mime[0].toLowerCase() === 'image'
 }
+
 </script>
 
 <template>
     <div class="bg-white border rounded p-4 mb-3">
         <div class="flex items-center gap-2 mb-3">
             <a href="javascript:void(0)">
-                <img :src="post.user.avatar"
+                <img :src="post.user.avatar_url"
                      class="w-[40px] rounded-full border border-2 transition-all hover:border-blue-500"/>
             </a>
             <div>
@@ -32,18 +33,21 @@ function isImage(attachment) {
         <div class="mb-3">
             <Disclosure v-slot="{ open }">
                 <div v-if="!open" v-html="post.body.substring(0, 200)"/>
-                <DisclosurePanel>
-                    <div v-html="post.body"/>
-                </DisclosurePanel>
-                <div class="flex justify-end">
-                    <DisclosureButton class="text-blue-500 hover:underline">
-                        {{ open ? 'Read less' : 'Read More' }}
-                    </DisclosureButton>
-                </div>
+                <template v-if="post.body.length > 200">
+                    <DisclosurePanel>
+                        <div v-html="post.body"/>
+                    </DisclosurePanel>
+                    <div class="flex justify-end">
+                        <DisclosureButton class="text-blue-500 hover:underline">
+                            {{ open ? 'Read less' : 'Read More' }}
+                        </DisclosureButton>
+                    </div>
+                </template>
             </Disclosure>
         </div>
         <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-3">
             <template v-for="attachment of post.attachments">
+
                 <div
                     class="group aspect-square bg-blue-100 flex flex-col items-center justify-center text-gray-500 relative">
                     <!-- Download-->
@@ -57,10 +61,10 @@ function isImage(attachment) {
                         </svg>
                     </button>
                     <!--/ Download-->
+
                     <img v-if="isImage(attachment)"
                          :src="attachment.url"
-                         class="object-cover aspect-square"
-                         alt=""/>
+                         class="object-cover aspect-square"/>
                     <template v-else>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
                              class="w-12 h-12">
@@ -69,6 +73,7 @@ function isImage(attachment) {
                             <path
                                 d="M12.971 1.816A5.23 5.23 0 0114.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 013.434 1.279 9.768 9.768 0 00-6.963-6.963z"/>
                         </svg>
+
                         <small>{{ attachment.name }}</small>
                     </template>
                 </div>
