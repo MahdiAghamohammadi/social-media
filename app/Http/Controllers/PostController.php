@@ -33,6 +33,12 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        // TODO
+        $id = auth()->id();
+        if ($post->user_id !== $id) {
+            return response("You don't have permission to delete this post", 403);
+        }
+        $post->delete();
+        return back();
     }
 }
