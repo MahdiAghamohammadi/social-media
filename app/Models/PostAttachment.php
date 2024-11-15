@@ -13,6 +13,7 @@ class PostAttachment extends Model
         'name',
         'path',
         'mime',
+        'size',
         'created_by',
     ];
 }
