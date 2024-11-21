@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Post extends Model
@@ -30,9 +31,9 @@ class Post extends Model
         return $this->hasMany(PostAttachment::class)->latest();
     }
 
-    public function reactions(): HasMany
+    public function reactions(): MorphMany
     {
-        return $this->hasMany(PostReaction::class);
+        return $this->morphMany(Reaction::class, 'object');
     }
 
     public function comments(): HasMany
