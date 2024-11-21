@@ -32,10 +32,20 @@ class StorePostRequest extends FormRequest
     {
         return [
             'body' => ['nullable', 'string'],
-            'attachments' => 'array|max:50',
+            'attachments' => [
+                'array',
+                'max:50',
+                function ($attribute, $value, $fail) {
+                    // Custom rule to check the total size of all files
+                    $totalSize = collect($value)->sum(fn(UploadedFile $file) => $file->getSize());
+                    if ($totalSize > 1 * 1024 * 1024 * 1024) {
+                        $fail('The total size of all files must not exceed 1GB.');
+                    }
+                },
+            ],
             'attachments.*' => [
                 'file',
-                File::types(self::$extensions)->max(500 * 1024 * 1024)
+                File::types(self::$extensions),
             ],
             'user_id' => ['numeric']
         ];
