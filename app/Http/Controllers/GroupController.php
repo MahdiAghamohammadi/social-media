@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Enums\GroupUserRole;
 use App\Http\Enums\GroupUserStatus;
 use App\Http\Requests\StoreGroupRequest;
+use App\Http\Requests\UpdateGroupRequest;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
+use App\Models\GroupUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,6 +46,10 @@ class GroupController extends Controller
             'created_by' => Auth::id()
         ];
         GroupUser::create($groupUserData);
+
+        $group->status = $groupUserData['status'];
+        $group->role = $groupUserData['role'];
+
         return response(new GroupResource($group), 201);
     }
 
@@ -66,7 +72,7 @@ class GroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Group $group)
+    public function update(UpdateGroupRequest $request, Group $group)
     {
         //
     }
