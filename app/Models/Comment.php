@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Comment extends Model
 {
+    public int $numOfComments = 0;
+    public array $childComments = [];
     protected $fillable = [
         'post_id',
         'comment',
