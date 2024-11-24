@@ -12,12 +12,16 @@ use App\Models\Group;
 use App\Models\GroupUser;
 use App\Notifications\InvitationApproved;
 use App\Notifications\InvitationInGroup;
+use App\Notifications\RequestToJoinGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use PhpParser\Node\Stmt\GroupUse;
+use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 class GroupController extends Controller
 {
@@ -35,14 +39,6 @@ class GroupController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      */
     public function store(StoreGroupRequest $request)
@@ -50,6 +46,7 @@ class GroupController extends Controller
         $data = $request->validated();
         $data['user_id'] = Auth::id();
         $group = Group::create($data);
+
         $groupUserData = [
             'status' => GroupUserStatus::APPROVED->value,
             'role' => GroupUserRole::ADMIN->value,
@@ -57,8 +54,8 @@ class GroupController extends Controller
             'group_id' => $group->id,
             'created_by' => Auth::id()
         ];
-        GroupUser::create($groupUserData);
 
+        GroupUser::create($groupUserData);
         $group->status = $groupUserData['status'];
         $group->role = $groupUserData['role'];
 
@@ -69,14 +66,6 @@ class GroupController extends Controller
      * Display the specified resource.
      */
     public function show(Group $group)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Group $group)
     {
         //
     }
@@ -138,13 +127,18 @@ class GroupController extends Controller
     public function inviteUsers(InviteUsersRequest $request, Group $group)
     {
         $data = $request->validated();
+
         $user = $request->user;
+
         $groupUser = $request->groupUser;
+
         if ($groupUser) {
             $groupUser->delete();
         }
+
         $hours = 24;
         $token = Str::random(256);
+
         GroupUser::create([
             'status' => GroupUserStatus::PENDING->value,
             'role' => GroupUserRole::USER->value,
@@ -154,7 +148,10 @@ class GroupController extends Controller
             'group_id' => $group->id,
             'created_by' => Auth::id(),
         ]);
+
         $user->notify(new InvitationInGroup($group, $hours, $token));
+
+
         return back()->with('success', 'User was invited to join to group');
     }
 
@@ -163,6 +160,7 @@ class GroupController extends Controller
         $groupUser = GroupUser::query()
             ->where('token', $token)
             ->first();
+
         $errorTitle = '';
         if (!$groupUser) {
             $errorTitle = 'The link is not valid';
@@ -171,14 +169,44 @@ class GroupController extends Controller
         } else if ($groupUser->token_expire_date < Carbon::now()) {
             $errorTitle = 'The link is expired';
         }
+
         if ($errorTitle) {
             return \inertia('Error', compact('errorTitle'));
         }
+
         $groupUser->status = GroupUserStatus::APPROVED->value;
         $groupUser->token_used = Carbon::now();
         $groupUser->save();
+
         $adminUser = $groupUser->adminUser;
+
         $adminUser->notify(new InvitationApproved($groupUser->group, $groupUser->user));
-        return redirect(route('group.profile', $groupUser->group))->with('success', 'You accepted to join to group "'.$groupUser->group->name.'"');
+
+        return redirect(route('group.profile', $groupUser->group))
+            ->with('success', 'You accepted to join to group "' . $groupUser->group->name . '"');
+    }
+
+    public function join(Group $group)
+    {
+        $user = \request()->user();
+
+        $status = GroupUserStatus::APPROVED->value;
+        $successMessage = 'You have joined to group "' . $group->name . '"';
+        if (!$group->auto_approval) {
+            $status = GroupUserStatus::PENDING->value;
+
+            Notification::send($group->adminUsers, new RequestToJoinGroup($group, $user));
+            $successMessage = 'Your request has been accepted. You will be notified once you will be approved';
+        }
+
+        GroupUser::create([
+            'status' => $status,
+            'role' => GroupUserRole::USER->value,
+            'user_id' => $user->id,
+            'group_id' => $group->id,
+            'created_by' => $user->id,
+        ]);
+
+        return back()->with('success', $successMessage);
     }
 }
