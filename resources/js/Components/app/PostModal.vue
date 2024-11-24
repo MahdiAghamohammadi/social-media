@@ -213,13 +213,15 @@ function undoDelete(myFile) {
                                     <PostUserHeader :post="post" :show-time="false" class="mb-4"/>
                                     <ckeditor :editor="editor" v-model="form.body" :config="editorConfig"></ckeditor>
 
-                                    <div v-if="showExtensionsText" class="border-l-4 border-amber-500 py-2 px-3 bg-amber-100 mt-3 text-gray-800">
+                                    <div v-if="showExtensionsText"
+                                         class="border-l-4 border-amber-500 py-2 px-3 bg-amber-100 mt-3 text-gray-800">
                                         Files must be one of the following extensions <br>
-                                        <small>{{attachmentExtensions.join(', ')}}</small>
+                                        <small>{{ attachmentExtensions.join(', ') }}</small>
                                     </div>
 
-                                    <div v-if="formErrors.attachments" class="border-l-4 border-red-500 py-2 px-3 bg-red-100 mt-3 text-gray-800">
-                                        {{formErrors.attachments}}
+                                    <div v-if="formErrors.attachments"
+                                         class="border-l-4 border-red-500 py-2 px-3 bg-red-100 mt-3 text-gray-800">
+                                        {{ formErrors.attachments }}
                                     </div>
 
                                     <div class="grid gap-3 my-3" :class="[
