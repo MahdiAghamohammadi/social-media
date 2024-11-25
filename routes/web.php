@@ -7,13 +7,14 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+    ->middleware(['auth', 'verified'])->name('dashboard');
 
 
-Route::get('/u/{user:username}', [ProfileController::class, 'index'])->name('profile');
+Route::get('/u/{user:username}', [ProfileController::class, 'index'])
+    ->name('profile');
 
-Route::get('/g/{group:slug}', [GroupController::class, 'profile'])->name('group.profile');
+Route::get('/g/{group:slug}', [GroupController::class, 'profile'])
+    ->name('group.profile');
 
 Route::get('/group/approve-invitation/{token}', [GroupController::class, 'approveInvitation'])
     ->name('group.approveInvitation');
@@ -21,6 +22,13 @@ Route::get('/group/approve-invitation/{token}', [GroupController::class, 'approv
 Route::middleware('auth')->group(function () {
     Route::post('/profile/update-images', [ProfileController::class, 'updateImage'])
         ->name('profile.updateImages');
+
+
+    // Groups
+    Route::post('/group', [GroupController::class, 'store'])
+        ->name('group.create');
+    Route::put('/group/{group:slug}', [GroupController::class, 'update'])
+        ->name('group.update');
 
     Route::post('/group/update-images/{group:slug}', [GroupController::class, 'updateImage'])
         ->name('group.updateImages');
@@ -70,9 +78,6 @@ Route::middleware('auth')->group(function () {
     Route::post('/comment/{comment}/reaction', [PostController::class, 'commentReaction'])
         ->name('comment.reaction');
 
-    // Groups
-    Route::post('/group', [GroupController::class, 'store'])
-        ->name('group.create');
 });
 
 require __DIR__ . '/auth.php';
