@@ -110,13 +110,19 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        // TODO
-        $id = auth()->id();
-        if ($post->user_id !== $id) {
-            return response("You don't have permission to delete this post", 403);
+        $id = Auth::id();
+
+        if ($post->isOwner($id) || $post->group && $post->group->isAdmin($id)) {
+            $post->delete();
+
+            if (!$post->isOwner($id)) {
+                $post->user->notify(new PostDeleted($post->group));
+            }
+
+            return back();
         }
-        $post->delete();
-        return back();
+
+        return response("You don't have permission to delete this post", 403);
     }
 
 
@@ -176,11 +182,20 @@ class PostController extends Controller
 
     public function deleteComment(Comment $comment)
     {
-        if ($comment->user_id !== Auth::id()) {
-            return response("You don't have permission to delete this comment.", 403);
+        $post = $comment->post;
+        $id = Auth::id();
+        if ($comment->isOwner($id) || $post->isOwner($id)) {
+            $comment->delete();
+
+            if (!$comment->isOwner($id)) {
+                $comment->user->notify(new CommentDeleted($comment, $post));
+            }
+
+            return response('', 204);
         }
-        $comment->delete();
-        return response('', 204);
+
+        return response("You don't have permission to delete this comment.", 403);
+
     }
 
     public function updateComment(UpdateCommentRequest $request, Comment $comment)
