@@ -2,7 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Http\Enums\GroupUserStatus;
+use App\Models\GroupUser;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\File;
 
 class StorePostRequest extends FormRequest
@@ -47,7 +50,16 @@ class StorePostRequest extends FormRequest
                 'file',
                 File::types(self::$extensions),
             ],
-            'user_id' => ['numeric']
+            'user_id' => ['numeric'],
+            'group_id' => ['nullable', 'exists:groups,id', function ($attribute, $value, \Closure $fail) {
+                $groupUser = GroupUser::where('user_id', Auth::id())
+                    ->where('group_id', $value)
+                    ->where('status', GroupUserStatus::APPROVED->value)
+                    ->exists();
+                if (!$groupUser) {
+                    $fail('You don\'t have permission to create post in this group');
+                }
+            }]
         ];
     }
 

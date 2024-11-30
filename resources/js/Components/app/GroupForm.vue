@@ -29,4 +29,4 @@ defineProps({
     </div>
 </template>
 <style scoped>
-</styl
+</style>
