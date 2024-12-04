@@ -4,11 +4,13 @@ import {ArrowDownTrayIcon} from '@heroicons/vue/24/outline'
 import {PaperClipIcon} from "@heroicons/vue/24/solid/index.js";
 import {ref} from "vue";
 import AttachmentPreviewModal from "@/Components/app/AttachmentPreviewModal.vue";
+
 defineProps({
     photos: Array
 })
 const currentPhotoIndex = ref(0)
 const showModal = ref(false)
+
 function openPhoto(index) {
     currentPhotoIndex.value = index
     showModal.value = true;
@@ -35,6 +37,11 @@ function openPhoto(index) {
             </div>
         </template>
     </div>
+
+    <div v-if="!photos.length" class="py-8 text-center text-gray-600">
+        There are no photos
+    </div>
+
     <AttachmentPreviewModal :attachments="photos || []"
                             v-model:index="currentPhotoIndex"
                             v-model="showModal"/>

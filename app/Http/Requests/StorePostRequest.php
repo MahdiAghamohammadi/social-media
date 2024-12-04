@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Enums\GroupUserStatus;
 use App\Models\GroupUser;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\File;
 
@@ -75,7 +76,8 @@ class StorePostRequest extends FormRequest
     public function messages()
     {
         return [
-            'attachments.*' => 'Invalid file'
+            'attachments.*.file' => 'Each attachment must be a file.',
+            'attachments.*.mimes' => 'Invalid file type for attachments.',
         ];
     }
 }
