@@ -30,8 +30,14 @@ use OpenAI\Laravel\Facades\OpenAI;
 class PostController extends Controller
 {
 
-    public function view(Post $post)
+    public function view(Request $request, Post $post)
     {
+        if ($post->group_id && !$post->group->hasApprovedUser(Auth::id())) {
+            return inertia('Error', [
+                'title' => 'Permission Denied',
+                'body' => "You don't have permission to view that post"
+            ])->toResponse($request)->setStatusCode(403);
+        }
         $post->loadCount('reactions');
         $post->load([
             'comments' => function ($query) {
@@ -237,13 +243,18 @@ class PostController extends Controller
         $post = $comment->post;
         $id = Auth::id();
         if ($comment->isOwner($id) || $post->isOwner($id)) {
+
+            $allComments = Comment::getAllChildrenComments($comment);
+            $deletedCommentCount = count($allComments);
+
             $comment->delete();
 
             if (!$comment->isOwner($id)) {
                 $comment->user->notify(new CommentDeleted($comment, $post));
             }
 
-            return response('', 204);
+
+            return response(['deleted' => $deletedCommentCount], 200);
         }
 
         return response("You don't have permission to delete this comment.", 403);
@@ -357,12 +368,15 @@ class PostController extends Controller
     {
         $forGroup = $request->get('forGroup', false);
         $group = $post->group;
+
         if ($forGroup && !$group) {
             return response("Invalid Request", 400);
         }
+
         if ($forGroup && !$group->isAdmin(Auth::id())) {
             return response("You don't have permission to perform this action", 403);
         }
+
         $pinned = false;
         if ($forGroup && $group->isAdmin(Auth::id())) {
             if ($group->pinned_post_id === $post->id) {
@@ -373,6 +387,7 @@ class PostController extends Controller
             }
             $group->save();
         }
+
         if (!$forGroup) {
             $user = $request->user();
             if ($user->pinned_post_id === $post->id) {
@@ -383,7 +398,9 @@ class PostController extends Controller
             }
             $user->save();
         }
-        return back()->with('success', 'Post was successfully ' . ($pinned ? 'pinned' : 'unpinned'));
+
+        return back()->with('success', 'Post was successfully ' . ( $pinned ? 'pinned' : 'unpinned' ));
+
 //        return response("You don't have permission to perform this action", 403);
     }
 }
