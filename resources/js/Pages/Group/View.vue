@@ -329,7 +329,7 @@ function updateGroup() {
                                               @approve="approveUser"
                                               @reject="rejectUser"/>
                             </div>
-                            <div class="py-8 text-center dark:text-gray-100">
+                            <div v-else class="py-8 text-center dark:text-gray-100">
                                 There are no pending requests.
                             </div>
                         </TabPanel>
