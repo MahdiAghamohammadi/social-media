@@ -17,7 +17,7 @@ defineProps({
 <template>
     <div class="flex items-center gap-2 ">
         <Link :href="route('profile', post.user.username)">
-            <img :src="post.user.avatar_url"
+            <img :src="post.user.avatar_url || '/img/default_avatar.webp'"
                  class="w-[40px] rounded-full border border-2 transition-all hover:border-blue-500"/>
         </Link>
         <div>

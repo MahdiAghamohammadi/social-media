@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SearchController extends Controller
 {
-    public function search(Request $request, string $search = null)
+    public function globalSearch(Request $request, string $search = null)
     {
         if (!$search)
             return redirect(route('dashboard'));
@@ -44,5 +44,12 @@ class SearchController extends Controller
             'users' => UserResource::collection($users),
             'groups' => GroupResource::collection($groups)
         ]);
+    }
+
+    public function searchInFollowings(Request $request, string $search = null)
+    {
+        $followings = \auth()->user()->followings()->where('name', 'like', "%$search%")->get();
+
+        return response()->json($followings);
     }
 }

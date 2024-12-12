@@ -123,7 +123,7 @@ function copyToClipboard() {
                             Copy Post URL
                         </button>
                     </MenuItem>
-                    <MenuItem v-if="pinAllowed" v-slot="{ active }">
+                    <MenuItem v-if="pinAllowed && group" v-slot="{ active }">
                         <button
                             @click="$emit('pin')"
                             :class="[

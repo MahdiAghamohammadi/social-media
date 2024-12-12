@@ -241,7 +241,9 @@ function followUser() {
                     <TabPanels class="mt-2">
                         <TabPanel>
                             <template v-if="posts">
-                                <CreatePost />
+                                <span v-if="isMyProfile">
+                                    <CreatePost />
+                                </span>
                                 <PostList :posts="posts.data" class="flex-1"/>
                             </template>
                             <div v-else class="py-8 text-center dark:text-gray-100">
@@ -259,7 +261,7 @@ function followUser() {
                                               :key="user.id"
                                               class="shadow rounded-lg"/>
                             </div>
-                            <div v-else class="text-center py-8">
+                            <div v-else class="text-center py-8 dark:text-gray-100">
                                 User does not have followers.
                             </div>
                         </TabPanel>
@@ -274,7 +276,7 @@ function followUser() {
                                               :key="user.id"
                                               class="shadow rounded-lg"/>
                             </div>
-                            <div v-else class="text-center py-8">
+                            <div v-else class="text-center py-8 dark:text-gray-100">
                                 The user is not following to anybody
                             </div>
                         </TabPanel>
