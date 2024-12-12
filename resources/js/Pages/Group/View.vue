@@ -1,11 +1,10 @@
 <script setup>
 import {computed, ref} from 'vue'
-import {XMarkIcon, CheckCircleIcon, CameraIcon} from '@heroicons/vue/24/solid'
-import {TabGroup, TabList, Tab, TabPanels, TabPanel} from '@headlessui/vue'
-import {usePage} from "@inertiajs/vue3";
+import {CameraIcon, CheckCircleIcon, XMarkIcon} from '@heroicons/vue/24/solid'
+import {Tab, TabGroup, TabList, TabPanel, TabPanels} from '@headlessui/vue'
+import {useForm, usePage} from "@inertiajs/vue3";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import TabItem from "@/Pages/Profile/Partials/TabItem.vue";
-import {useForm} from '@inertiajs/vue3'
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import InviteUserModal from "@/Pages/Group/InviteUserModal.vue";
 import UserListItem from "@/Components/app/UserListItem.vue";
@@ -280,7 +279,7 @@ function updateGroup() {
                         <Tab v-if="isJoinedToGroup" v-slot="{ selected }" as="template">
                             <TabItem text="Users" :selected="selected"/>
                         </Tab>
-                        <Tab v-if="isCurrentUserAdmin" v-slot="{ selected }" as="template">
+                        <Tab v-if="isCurrentUserAdmin && !group.auto_approval" v-slot="{ selected }" as="template">
                             <TabItem text="Pending Requests" :selected="selected"/>
                         </Tab>
                         <Tab v-slot="{ selected }" as="template">
@@ -305,9 +304,10 @@ function updateGroup() {
                             </div>
                         </TabPanel>
                         <TabPanel v-if="isJoinedToGroup">
-                            <div class="mb-3">
-                                <TextInput :model-value="searchKeyword" placeholder="Type to search" class="w-full"/>
-                            </div>
+<!--                            <div class="mb-3">
+                                <TextInput v-model="searchKeyword" placeholder="Type to search" class="w-full"
+                                           @keyup.enter="searchUser"/>
+                            </div>-->
                             <div class="grid grid-cols-2 gap-3">
                                 <UserListItem v-for="user of users"
                                               :user="user"
@@ -319,7 +319,7 @@ function updateGroup() {
                                               @delete="deleteUser"/>
                             </div>
                         </TabPanel>
-                        <TabPanel v-if="isCurrentUserAdmin" class="">
+                        <TabPanel v-if="isCurrentUserAdmin && !group.auto_approval" class="">
                             <div v-if="requests.length" class="grid grid-cols-2 gap-3">
                                 <UserListItem v-for="user of requests"
                                               :user="user"

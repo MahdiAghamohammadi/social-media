@@ -19,9 +19,10 @@ function onGroupCreate(group) {
 
 <template>
     <div class="flex gap-2  mt-4">
-        <TextInput :model-value="searchKeyword" placeholder="Type to search" class="w-full"/>
+<!--        <TextInput v-model="searchKeyword" placeholder="Type to search" class="w-full"-->
+<!--                @keyup.enter="searchGroups"/>-->
         <button @click="showNewGroupModal = true"
-                class="text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded py-1 px-2 w-[120px]">
+                class="text-sm bg-indigo-500 hover:bg-indigo-600 text-white rounded py-1 px-2 w-full">
             new group
         </button>
     </div>

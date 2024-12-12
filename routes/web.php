@@ -112,8 +112,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/comment/{comment}/reaction', [PostController::class, 'commentReaction'])
         ->name('comment.reaction');
 
-    Route::get('/search/{search?}', [SearchController::class, 'search'])
-        ->name('search');
+    Route::get('/search/{search?}', [SearchController::class, 'globalSearch'])
+        ->name('global-search');
+
+    Route::get('/search-in-followings/{search?}', [SearchController::class, 'searchInFollowings'])
+        ->name('search-in-followings');
 });
 
 require __DIR__ . '/auth.php';

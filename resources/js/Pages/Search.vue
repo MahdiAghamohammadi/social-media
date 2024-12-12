@@ -38,7 +38,7 @@ const props = defineProps({
             </div>
 
             <div>
-                <h2 class="text-lg font-bold">Posts</h2>
+                <h2 class="text-lg font-bold dark:text-gray-100">Posts</h2>
                 <PostList v-if="posts.data.length" :posts="posts.data" class="flex-1"/>
                 <div v-else class="py-8 text-center text-gray-500">
                     No posts were found.
