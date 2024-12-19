@@ -37,7 +37,8 @@ class InvitationInGroup extends Notification
     {
         return (new MailMessage)
             ->line('You have been invited to join to group "' . $this->group->name . '"')
-            ->action('Join the Group', url(route('group.approveInvitation', $this->token)))
+//            ->action('Join the Group', url(route('group.approveInvitation', $this->token)))
+            ->action('Join the Group', url(route('dashboard')))
             ->line('The link will be valid for next ' . $this->hours . ' hours');
     }
 
