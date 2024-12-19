@@ -52,6 +52,35 @@ const props = defineProps({
     photos: Array
 });
 
+const localFollowings = ref([...props.followings])
+const localfollowers = ref([...props.followers])
+
+function searchFollowings() {
+    axios.get(route('search-in-followings', {
+        user: props.user,
+        search: encodeURIComponent(searchFollowingsKeyword.value)
+    }))
+        .then(res => {
+            localFollowings.value = res.data
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
+function searchFollowers() {
+    axios.get(route('search-in-followers', {
+        user: props.user,
+        search: encodeURIComponent(searchFollowersKeyword.value)
+    }))
+        .then(res => {
+            localfollowers.value = res.data
+        })
+        .catch(err => {
+            console.log(err)
+        })
+}
+
 function onCoverChange(event) {
     imagesForm.cover = event.target.files[0]
     if (imagesForm.cover) {
@@ -242,7 +271,7 @@ function followUser() {
                         <TabPanel>
                             <template v-if="posts">
                                 <span v-if="isMyProfile">
-                                    <CreatePost />
+                                    <CreatePost/>
                                 </span>
                                 <PostList :posts="posts.data" class="flex-1"/>
                             </template>
@@ -252,11 +281,11 @@ function followUser() {
                         </TabPanel>
                         <TabPanel>
                             <div class="mb-3">
-                                <TextInput :model-value="searchFollowersKeyword" placeholder="Type to search"
-                                           class="w-full"/>
+                                <TextInput v-model="searchFollowersKeyword" placeholder="Type to search"
+                                           class="w-full" @keyup.stop="searchFollowers"/>
                             </div>
                             <div v-if="followers.length" class="grid grid-cols-2 gap-3">
-                                <UserListItem v-for="user of followers"
+                                <UserListItem v-for="user of localfollowers"
                                               :user="user"
                                               :key="user.id"
                                               class="shadow rounded-lg"/>
@@ -267,11 +296,11 @@ function followUser() {
                         </TabPanel>
                         <TabPanel>
                             <div class="mb-3">
-                                <TextInput :model-value="searchFollowingsKeyword" placeholder="Type to search"
-                                           class="w-full"/>
+                                <TextInput v-model="searchFollowingsKeyword" placeholder="Type to search"
+                                           class="w-full" @keyup.stop="searchFollowings"/>
                             </div>
                             <div v-if="followings.length" class="grid grid-cols-2 gap-3">
-                                <UserListItem v-for="user of followings"
+                                <UserListItem v-for="user of localFollowings"
                                               :user="user"
                                               :key="user.id"
                                               class="shadow rounded-lg"/>
@@ -281,7 +310,7 @@ function followUser() {
                             </div>
                         </TabPanel>
                         <TabPanel>
-                            <TabPhotos :photos="photos" />
+                            <TabPhotos :photos="photos"/>
                         </TabPanel>
                         <TabPanel v-if="isMyProfile">
                             <Edit :must-verify-email="mustVerifyEmail" :status="status"/>

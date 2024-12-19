@@ -46,10 +46,17 @@ class SearchController extends Controller
         ]);
     }
 
-    public function searchInFollowings(Request $request, string $search = null)
+    public function searchInFollowings(Request $request, User $user, string $search = null)
     {
-        $followings = \auth()->user()->followings()->where('name', 'like', "%$search%")->get();
+        $followings = $user->followings()->where('name', 'like', "%$search%")->get();
 
         return response()->json($followings);
+    }
+
+    public function searchInFollowers(Request $request, User $user, string $search = null)
+    {
+        $followers = $user->followers()->where('name', 'like', "%$search%")->get();
+
+        return response()->json($followers);
     }
 }

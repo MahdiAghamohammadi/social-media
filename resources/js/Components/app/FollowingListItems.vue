@@ -3,6 +3,10 @@ import TextInput from "@/Components/TextInput.vue";
 import UserListItem from "@/Components/app/UserListItem.vue";
 import {ref} from "vue";
 
+import {usePage} from "@inertiajs/vue3";
+
+const page = usePage()
+
 const searchKeyword = ref('')
 
 const props = defineProps({
@@ -12,7 +16,10 @@ const props = defineProps({
 const localUser = ref([...props.users])
 
 function searchFollowings() {
-    axios.get(route('search-in-followings', encodeURIComponent(searchKeyword.value)))
+    axios.get(route('search-in-followings', {
+        user: page.props.auth.user,
+        search: encodeURIComponent(searchKeyword.value)
+    }))
         .then(res => {
             localUser.value = res.data
         })
@@ -25,7 +32,7 @@ function searchFollowings() {
 
 <template>
     <TextInput v-model="searchKeyword" placeholder="Type to search" class="w-full mt-3"
-               @keyup.enter="searchFollowings"/>
+               @keyup.stop="searchFollowings"/>
     <div class="mt-3 h-[200px] lg:flex-1 overflow-auto">
         <div v-if="false" class="text-gray-400 text-center p-3 dark:text-gray-100">
             You don't have friends yet.

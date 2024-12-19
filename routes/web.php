@@ -115,8 +115,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/search/{search?}', [SearchController::class, 'globalSearch'])
         ->name('global-search');
 
-    Route::get('/search-in-followings/{search?}', [SearchController::class, 'searchInFollowings'])
+    Route::get('/search-in-followings/{user:username}/{search?}', [SearchController::class, 'searchInFollowings'])
         ->name('search-in-followings');
+
+    Route::get('/search-in-followers/{user:username}/{search?}', [SearchController::class, 'searchInFollowers'])
+        ->name('search-in-followers');
 });
 
 require __DIR__ . '/auth.php';
