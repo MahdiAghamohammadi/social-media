@@ -29,7 +29,7 @@ defineEmits(['approve', 'reject', 'roleChange', 'delete'])
             </Link>
             <div class="flex justify-between flex-1">
                 <Link :href="route('profile', user.username)">
-                    <h3 class="font-black hover:underline">{{ user.name }}</h3>
+                    <h3 class="text-black dark:text-white hover:underline">{{ user.name }}</h3>
                 </Link>
                 <div v-if="forApprove" class="flex gap-1">
                     <button class="text-xs py-1 px-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white"
